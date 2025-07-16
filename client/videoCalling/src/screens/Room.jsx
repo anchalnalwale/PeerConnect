@@ -24,16 +24,25 @@ const Room = () => {
         setMystream(stream)
     }, [remoteSocketId, socket]);
 
-    const handleIncomingCall = useCallback(() => {}, [])
+    const handleIncomingCall = useCallback(async({from, offer}) => {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: true
+        });
+        setMystream(stream);
+        console.log(`Incoming Call`, from, offer);
+        const ans = await peer.getAnswer(offer)
+        socket.emit("call: accepted", {to: from , ans});
+    }, [socket]);
 
     useEffect(() => {
         socket.on('user:joined', handleUserJoined);
-        socket.on('incoming: call', handleIncomingCall)
+        socket.on("incoming: call", handleIncomingCall)
         return () => {
             socket.off('user:joined', handleUserJoined)
-            socket.off('incoming: call', handleIncomingCall)
+            socket.off("incoming: call", handleIncomingCall)
         }
-    }, [socket, handleUserJoined]);
+    }, [socket, handleUserJoined, handleIncomingCall]);
 
 
   return (
