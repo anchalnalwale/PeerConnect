@@ -22,14 +22,19 @@ const Room = () => {
         const Offer = await peer.getOffer();
         socket.emit("user:call", {to: remoteSocketId,Offer});
         setMystream(stream)
-    }, []);
+    }, [remoteSocketId, socket]);
+
+    const handleIncomingCall = useCallback(() => {}, [])
 
     useEffect(() => {
         socket.on('user:joined', handleUserJoined);
+        socket.on('incoming: call', handleIncomingCall)
         return () => {
             socket.off('user:joined', handleUserJoined)
+            socket.off('incoming: call', handleIncomingCall)
         }
     }, [socket, handleUserJoined]);
+
 
   return (
     <div>
