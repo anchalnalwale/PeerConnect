@@ -17,11 +17,11 @@ const Room = () => {
     const handleCallUser = useCallback(async () => {
         const stream = await navigator.mediaDevices.getUserMedia({
             audio: true,
-            video: true
+            video: true,
         });
-        const Offer = await peer.getOffer();
-        socket.emit("user:call", {to: remoteSocketId,Offer});
-        setMystream(stream)
+        const offer = await peer.getOffer();
+        socket.emit("user:call", {to: remoteSocketId, offer});
+        setMyStream(stream)
     }, [remoteSocketId, socket]);
 
     const handleIncomingCall = useCallback(async({from, offer}) => {
@@ -40,9 +40,9 @@ const Room = () => {
         socket.on("incoming: call", handleIncomingCall)
         return () => {
             socket.off('user:joined', handleUserJoined)
-            socket.off("incoming: call", handleIncomingCall)
+            socket.off("incoming:call", handleIncomingCall)
         }
-    }, [socket, handleUserJoined, handleIncomingCall]);
+    }, [socket,handleUserJoined,handleIncomingCall]);
 
 
   return (
