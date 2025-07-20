@@ -30,20 +30,27 @@ const Room = () => {
             audio: true,
             video: true,
         });
-        setMystream(stream);
+        setMystream(myStream);
         console.log(`Incomming Call`, from, offer);
         const ans = await peer.getAnswer(offer);
         socket.emit("call:accepted", {to: from, ans});
     }, [socket]);
 
+    const handleCallAccepted = useCallback(({from, ans}) => {
+        peer.setLocalDescription(ans)
+        console.log("Call Accepted!");
+    }, []);
+
     useEffect(() => {
         socket.on("user:joined", handleUserJoined);
-        socket.on("incomming: call", handleIncommingCall);
+        socket.on("incomming:call", handleIncommingCall);
+        socket.on("call:accepted", handleCallAccepted);
         return () => {
             socket.off("user:joined", handleUserJoined)
             socket.off("incomming:call", handleIncommingCall)
+            socket.off("call:accepted", handleCallAccepted)
         }
-    }, [socket,handleUserJoined,handleIncommingCall]);
+    }, [socket,handleUserJoined,handleIncommingCall,handleCallAccepted]);
 
 
   return (
