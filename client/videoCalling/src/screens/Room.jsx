@@ -37,9 +37,11 @@ const Room = () => {
         socket.emit("call:accepted", { to: from, ans });
     }, [socket]);
 
-    const sendStreams = (() => {
-        for(const track of myStream.getTracks()) {
-            peer.peer.addTrack(track,myStream);
+    const sendStreams = useCallback(() => {
+        if (myStream) {
+            for (const track of myStream.getTracks()) {
+                peer.peer.addTrack(track, myStream);
+            }
         }
     }, [myStream]);
 
@@ -65,16 +67,22 @@ const Room = () => {
         };
     }, [handleNegoNeeded]);
 
-    const handleNegoNeedIncoming = useCallback(async({ from, offer }) => {
+    const handleNegoNeedIncoming = useCallback(async ({ from, offer }) => {
         const ans = await peer.getAnswer(offer);
         socket.emit("peer:nego:done", { to: from, ans });
     }, [socket]);
 
     useEffect(() => {
         peer.peer.addEventListener('track', async ev => {
-            const remoteStream = ev.streams;
-            console.log("GOT TRACKS!!");
-            setRemoteStream(remoteStream[0]);
+            const remoteStream = ev.streams[0];
+            if (remoteStream) {
+                console.log("✅ Remote stream received:", remoteStream);
+                setRemoteStream(remoteStream);
+            } 
+            else 
+            {
+                console.warn("⚠️ No remote stream found in 'track' event");
+            }
         });
     }, [])
 
@@ -100,28 +108,28 @@ const Room = () => {
             {myStream && <button onClick={sendStreams}>Send Stream</button>}
             {remoteSocketId && <button onClick={handleCallUser}>CALL</button>}
 
-            {remoteStream && (
+            {myStream && (
                 <>
                     <h1>My Stream</h1>
-                    <ReactPlayer
+                    {/* <ReactPlayer
                         playing
                         muted
                         height="300px"
                         width="500px"
                         url={remoteStream}
-                    />
-                    {/* <video
+                    /> */}
+                    <video
                         playsInline
                         autoPlay
                         muted
-                        height="200"
-                        width="300"
+                        height="300"
+                        width="500"
                         ref={(videoRef) => {
                             if (videoRef) {
                                 videoRef.srcObject = myStream;
                             }
                         }}
-                    /> */}
+                    />
                 </>
             )}
 
