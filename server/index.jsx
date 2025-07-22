@@ -1,4 +1,5 @@
 const {Server} = require("socket.io");
+// const peer = require("../client/videoCalling/src/service/peer.jsx");
 
 const io = new Server(8000, {
     cors: true,
@@ -27,10 +28,12 @@ io.on("connection", (socket) => {
     });
 
      socket.on("peer:nego:needed", ({ to, offer }) => {
+        console.log("peer:nego:needed",offer)
         io.to(to).emit("peer:nego:needed", { from: socket.id, offer });
     });
 
     socket.on("peer:nego:done", ({ to, ans }) => {
+        console.log('peer:nego:final',ans)
         io.to(to).emit("peer:nego:final", { from: socket.id, ans });
     });
 });
