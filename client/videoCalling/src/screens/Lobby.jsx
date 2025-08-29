@@ -29,7 +29,7 @@ const Lobby = () => {
     return () => {
       socket.off('room:join', handleJoinRoom);
     }
-  }, [socket, handleJoinRoom]); // Added handleJoinRoom to dependency array for useEffect to avoid lint warnings
+  }, [socket, handleJoinRoom]); 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 to-indigo-800 flex items-center justify-center p-4 sm:p-6">
